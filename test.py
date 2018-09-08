@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+import os
 
 from parsers.city import City
 from parsers.hotel import Hotel
@@ -10,6 +11,7 @@ from parsers.user import User
 from parsers.vacationrental import VacationRental
 
 #from TripAdvDatabase import TripAdvDatabase
+CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def main():
     # instantiate and argument parser
@@ -29,6 +31,9 @@ def main():
 
     if city.uri:
         city.start()
+        current_city_path = os.path.join(CURRENT_PATH, 'data', city.name)
+        print(current_city_path)
+        os.makedirs(current_city_path, exist_ok=True)
         restaurant_URIs = city.get_all_resturant_in_city()
 
     else:
