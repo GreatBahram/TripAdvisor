@@ -47,7 +47,7 @@ def get_hotels(hotel_link_list,city_name ):
         hotel_completed.insert({'city': city_name, 'all_hotel_review_count': n_all_rw})
 
 def get_resturants(resturant_link_list,city_name) :
-        resturant = Resturant()
+        resturant = Restaurant()
         resturant.set_database(db_)
         resturant.set_city_name(city.name)
         n_all_rw = 0;
