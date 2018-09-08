@@ -25,7 +25,11 @@ resturant_completed = mydb['resturant_completed']
 vacation_rental_completed = mydb['vacation_rental']
 thing_to_do_completed = mydb['thing_to_do']
 
-city_list = ['Tehran','Hong Kong','Bangkok','London','Singapore','Macau','Dubai','Paris','New York','Shenzhen','Kuala Lumpur','Phuket','Rome','Tokyo','Taipei','Istanbul','Seoul','Guangzhou','Prague','Mecca','Miami','Delhi','Mumbai','Barcelona','Pattaya','Shanghai','Las Vegas','Milan','Amsterdam','Antalya','Vienna']
+city_list = [
+        'Tehran', 'Hong Kong', 'Bangkok', 'London', 'Singapore', 'Macau', 'Dubai', 'Paris', 'New York', 'Shenzhen', 'Kuala Lumpur', 'Phuket',
+        'Rome', 'Tokyo', 'Taipei', 'Istanbul', 'Seoul', 'Guangzhou', 'Prague', 'Mecca', 'Miami', 'Delhi', 'Mumbai', 'Barcelona', 'Pattaya', 'Shanghai',
+        'Las Vegas', 'Milan', 'Amsterdam', 'Antalya', 'Vienna', 
+        ]
 
 def get_hotels(hotel_link_list,city_name ):
         hotel = Hotel()
@@ -86,7 +90,6 @@ def get_thing_to_do(thing_to_do_link_list,city_name):
             except Exception as e:
                 continue
         thing_to_do_completed.insert({'city': city_name, 'all_thing_to_do_review_count': n_all_rw})
-
 
 def main():
         city_name = 'Tehran'
@@ -169,7 +172,5 @@ def main():
                 print("ALL DONE FOR CITY {}".format(city_name))
                 exit(0)
             time.sleep(5)
-
-
 
 if __name__ == "__main__": main()
