@@ -8,7 +8,9 @@ from lxml.etree import tostring
 
 
 class City:
+    """
 
+    """
     def __init__(self):
         self.trip_advisor = 'https://www.tripadvisor.ca'
         self.name = ''
@@ -27,8 +29,8 @@ class City:
         self.trip_advisor = 'https://www.tripadvisor.ca'
         self.name = name
         self.Session = requests.session()
-        self.uri = self.__get_city_uri(name)
-        self.city_page = self.__openpage(self.uri)
+        self.uri = self._get_city_uri(name)
+        self.city_page = self._openpage(self.uri)
         self.vacation_rentals_link = ''
         self.hotels_link = ''
         self.attration_link = ''
@@ -38,14 +40,14 @@ class City:
         self.vacation_rentals = []
 
     def start(self):
-        self.__get_city_links()
+        self._get_city_links()
 
-    def __find_variable(self, text, variable):
+    def _find_variable(self, text, variable):
         a = text.find(variable) + len(variable)
         b = text.find('"', text.find(variable) + len(variable))
         return text[a: b]
 
-    def __get_city_uri(self, city_name):
+    def _get_city_uri(self, city_name):
         # Create today directory for new crs
         try:
             first_page = self.Session.get(self.trip_advisor)
@@ -54,7 +56,7 @@ class City:
             return None
 
         # Get City Url
-        search_session_id = self.__find_variable(first_page.text, 'typeahead.searchSessionId":"')
+        search_session_id = self._find_variable(first_page.text, 'typeahead.searchSessionId":"')
         time_now = str(int(time.time() * 1000))
         fetch_city_url = 'https://www.tripadvisor.ca/TypeAheadJson?interleaved=true&geoPages=true&details=true&types' \
                          '=geo,hotel,eat,attr,vr,air,theme_park,al,act,train,' \
@@ -72,7 +74,7 @@ class City:
                 return self.trip_advisor + data.get("results")[0]['url']
         return None
 
-    def __openpage(self, uri):
+    def _openpage(self, uri):
         try:
             city_page = self.Session.get(uri)
         except Exception as e:
@@ -80,7 +82,7 @@ class City:
             exit(1)
         return city_page.text
 
-    def __get_city_links(self):
+    def _get_city_links(self):
         tree = html.fromstring(self.city_page)
         nev_links = list(set(tree.xpath('//div[@class="navLinks"]/ul/li/a/@href')))
         for _ in nev_links:
@@ -94,7 +96,7 @@ class City:
                 self.vacation_rentals_link = self.trip_advisor + str(_)
 
     def get_all_hotels_in_city(self):
-        hotel_page = self.__openpage(self.hotels_link)
+        hotel_page = self._openpage(self.hotels_link)
         tree = html.fromstring(hotel_page)
         hotels = list(
             set(tree.xpath('//a[contains(concat( " ", @class, " " ), concat( " ", "prominent", " " ))]/@href')))
@@ -121,7 +123,7 @@ class City:
                 a = page.find('-oa') + len('-oa')
                 b = page.find('-', page.find('-oa') + len('-oa'))
                 page = page[:a] + str(i) + page[b:]
-                hotel_page = self.__openpage(self.trip_advisor + page)
+                hotel_page = self._openpage(self.trip_advisor + page)
                 tree = html.fromstring(hotel_page)
                 hotels += list(
                     set(tree.xpath('//a[contains(concat( " ", @class, " " ), concat( " ", "prominent", " " ))]/@href')))
@@ -132,7 +134,7 @@ class City:
         return self.hotels
 
     def get_all_resturant_in_city(self):
-        resturant_page = self.__openpage(self.resturant_link)
+        resturant_page = self._openpage(self.resturant_link)
         tree = html.fromstring(resturant_page)
         resturants = list(
             set(tree.xpath('//div[(@id = "EATERY_LIST_CONTENTS")]//a[contains(concat( " ", @class, " " ), concat( " '
@@ -161,7 +163,7 @@ class City:
                 a = page.find('-oa') + len('-oa')
                 b = page.find('-', page.find('-oa') + len('-oa'))
                 page = page[:a] + str(i) + page[b:]
-                resturant_page = self.__openpage(self.trip_advisor + page)
+                resturant_page = self._openpage(self.trip_advisor + page)
                 tree = html.fromstring(resturant_page)
                 resturants += list(
                                 set(tree.xpath('//div[(@id = "EATERY_LIST_CONTENTS")]//a[contains(concat( " ", @class, " " ), concat( " '
@@ -175,7 +177,7 @@ class City:
     def get_all_vacation_rental_in_city(self):
         if self.vacation_rentals_link == "":
             return []
-        vacation_rental_page = self.__openpage(self.vacation_rentals_link)
+        vacation_rental_page = self._openpage(self.vacation_rentals_link)
         tree = html.fromstring(vacation_rental_page)
         vacation_rentals = list(
             set(tree.xpath('//a[contains(concat( " ", @class, " " ), concat( " ", "vrPhotoLink", " " ))]/@href')))
@@ -202,7 +204,7 @@ class City:
                 a = page.find('-oa') + len('-oa')
                 b = page.find('-', page.find('-oa') + len('-oa'))
                 page = page[:a] + str(i) + page[b:]
-                vacation_rental_page = self.__openpage(self.trip_advisor + page)
+                vacation_rental_page = self._openpage(self.trip_advisor + page)
                 tree = html.fromstring(vacation_rental_page)
                 vacation_rentals += list(
                                 set(tree.xpath('//a[contains(concat( " ", @class, " " ), concat( " ", "vrPhotoLink", " " ))]/@href')))
@@ -215,7 +217,7 @@ class City:
     def get_all_thing_to_do_in_city(self):
         if self.attration_link == "":
             return []
-        atraction_page = self.__openpage(self.attration_link)
+        atraction_page = self._openpage(self.attration_link)
         tree = html.fromstring(atraction_page)
         attration = list(
             set(tree.xpath('//a[contains(concat( " ", @class, " " ), concat( " ", "vrPhotoLink", " " ))]/@href')))
@@ -242,7 +244,7 @@ class City:
                 a = page.find('-oa') + len('-oa')
                 b = page.find('-', page.find('-oa') + len('-oa'))
                 page = page[:a] + str(i) + page[b:]
-                atraction_page = self.__openpage(self.trip_advisor + page)
+                atraction_page = self._openpage(self.trip_advisor + page)
                 tree = html.fromstring(atraction_page)
                 attration += list(
                                 set(tree.xpath('//a[contains(concat( " ", @class, " " ), concat( " ", "photo_link", " " ))]/@href')))

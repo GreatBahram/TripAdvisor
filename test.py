@@ -1,16 +1,17 @@
-from City import City
-from Resturant import Resturant
-from VacationRental import VacationRental
-from User import User
-from ThingToDo import ThingToDo
-from Hotel import Hotel
-from TripAdvDatabase import TripAdvDatabase
+from parsers.city import City
+from parsers.hotel import Hotel
+from parsers.resturant import Resturant
+from parsers.thingtodo import ThingToDo
+from parsers.user import User
+from parsers.vacationrental import VacationRental
+
+#from TripAdvDatabase import TripAdvDatabase
 
 city = City()
-db_ = TripAdvDatabase()
-db_.connect_to('tripadvisor','reveiws')
-db_.correct_reveiew_texts_for_csv()
-print("done")
+## db_ = TripAdvDatabase()
+## db_.connect_to('tripadvisor','reveiws')
+## db_.correct_reveiew_texts_for_csv()
+## print("done")
 # city.set_city('Tehran')
 # if city.uri == '':
 #     print('cannot load paris page')

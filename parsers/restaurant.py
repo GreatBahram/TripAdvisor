@@ -1,12 +1,10 @@
-from lxml.etree import tostring
 import requests
+
 from lxml import html
+from lxml.etree import tostring
 
 
 class Restaurant:
-
-    def set_database(self,database):
-        self.database = database
 
     def set_city_name(self,city_name):
         self.city_name = city_name
