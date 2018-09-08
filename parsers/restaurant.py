@@ -3,7 +3,7 @@ import requests
 from lxml import html
 
 
-class Resturant:
+class Restaurant:
 
     def set_database(self,database):
         self.database = database

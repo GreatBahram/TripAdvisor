@@ -1,12 +1,14 @@
-from City import City
-from Resturant import Resturant
-from VacationRental import VacationRental
-from User import User
-from ThingToDo import ThingToDo
-from Hotel import Hotel
-from TripAdvDatabase import TripAdvDatabase
 import threading
 import time
+
+from dbhelper import TripAdvDatabase
+from parsers.city import City
+from parsers.hotel import Hotel
+from parsers.restaurant import Restaurant
+from parsers.user import User
+from parsers.vacationrental import VacationRental
+from ThingToDo import ThingToDo
+
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
