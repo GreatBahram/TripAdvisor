@@ -1,18 +1,20 @@
 import json
 import time
-from lxml.etree import tostring
+
 import requests
+
 from lxml import html
+from lxml.etree import tostring
 
 
 class City:
 
-    def set_city(self, name):
+    def __init__(self):
         self.trip_advisor = 'https://www.tripadvisor.ca'
-        self.name = name
+        self.name = ''
         self.Session = requests.session()
-        self.uri = self.__get_city_uri(name)
-        self.city_page = self.__openpage(self.uri)
+        self.uri = ''
+        self.city_page = ''
         self.vacation_rentals_link = ''
         self.hotels_link = ''
         self.attration_link = ''
@@ -21,12 +23,12 @@ class City:
         self.resturants = []
         self.vacation_rentals = []
 
-    def __init__(self):
+    def set_city(self, name):
         self.trip_advisor = 'https://www.tripadvisor.ca'
-        self.name = ''
+        self.name = name
         self.Session = requests.session()
-        self.uri = ''
-        self.city_page = ''
+        self.uri = self.__get_city_uri(name)
+        self.city_page = self.__openpage(self.uri)
         self.vacation_rentals_link = ''
         self.hotels_link = ''
         self.attration_link = ''

@@ -1,6 +1,7 @@
-from lxml.etree import tostring
 import requests
+
 from lxml import html
+from lxml.etree import tostring
 
 
 class Hotel:

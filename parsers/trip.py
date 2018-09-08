@@ -1,10 +1,11 @@
 import json
 import time
+
+import requests
+
+from lxml import html
 from lxml.etree import tostring
 from tripDatabase import *
-import requests
-from lxml import html
-
 
 Session = requests.session()
 tripadvisor = 'https://www.tripadvisor.ca'
