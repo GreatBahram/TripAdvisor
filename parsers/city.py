@@ -8,21 +8,11 @@ from lxml.etree import tostring
 
 
 class City:
-    """
-
-    """
-    def __init__(self):
+    """ Parse all city things """
+    def __init__(self, cityname):
+        self.name = cityname
         self.trip_advisor = 'https://www.tripadvisor.ca'
-        self.name = ''
         self.Session = requests.session()
-        self.uri = ''
-
-    def set_city(self, name):
-        self.trip_advisor = 'https://www.tripadvisor.ca'
-        self.name = name
-        self.Session = requests.session()
-        self.uri = self._get_city_uri(name)
-        self.city_page = self._openpage(self.uri)
         self.vacation_rentals_link = ''
         self.hotels_link = ''
         self.attration_link = ''
@@ -30,6 +20,8 @@ class City:
         self.hotels = []
         self.resturants = []
         self.vacation_rentals = []
+        self.uri = self._get_city_uri()
+        self.city_page = self._openpage(self.uri)
 
     def start(self):
         self._get_city_links()
@@ -39,7 +31,7 @@ class City:
         b = text.find('"', text.find(variable) + len(variable))
         return text[a: b]
 
-    def _get_city_uri(self, city_name):
+    def _get_city_uri(self):
         # Create today directory for new crs
         try:
             first_page = self.Session.get(self.trip_advisor)
@@ -56,7 +48,7 @@ class City:
                          '=true&matchOverview=true&matchUserProfiles=true&strictAnd=false&scoreThreshold=0.8&hglt' \
                          '=true&disableMaxGroupSize=true&max=6&injectNewLocation=true&injectLists=true&nearby=true' \
                          '&local=true&parentids=&typeahead1_5=true&geoBoostFix=true&nearPages=true&nearPagesLevel' \
-                         '=strict&supportedSearchTypes=find_near_stand_alone_query&query=' + city_name + \
+                         '=strict&supportedSearchTypes=find_near_stand_alone_query&query=' + self.name + \
                          '&action=API&uiOrigin=MASTHEAD&source=MASTHEAD&startTime=' + time_now + '&searchSessionId=' \
                          + search_session_id
         fetched_cities = self.Session.get(fetch_city_url)

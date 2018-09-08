@@ -1,5 +1,6 @@
 import argparse
 import logging
+import sys
 
 from parsers.city import City
 from parsers.hotel import Hotel
@@ -10,32 +11,33 @@ from parsers.vacationrental import VacationRental
 
 #from TripAdvDatabase import TripAdvDatabase
 
-# instantiate and config logger
-logger = logging.getLogger(__name__)
-logformat = '%(asctime)-12s - %(name)s - %(levelname)s - %(message)s'
-logging.basicConfig( format=logformat, datefmt='%y/%m/%d %H-%M', level=logging.INFO)
-
-# instantiate and argument parser
-parser = argparse.ArgumentParser(description='a simple CLI for trip adviser information gathering',)
-parser.add_argument('cityname', help='City name cannot left be blank!')
-
-
-if __name__ == '__main__':
+def main():
+    # instantiate and argument parser
+    parser = argparse.ArgumentParser(description='a simple CLI for trip adviser information gathering',)
+    parser.add_argument('cityname', help='City name cannot left be blank!')
     data = parser.parse_args()
-    cityname = data.cityname
-    city = City()
-    city.set_city('Tehran')
+
+    # instantiate and config logger
+    logger = logging.getLogger(__name__)
+    logformat = '%(asctime)-12s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig( format=logformat, datefmt='%y/%m/%d %H-%M', level=logging.INFO)
+
+    cityname = data.cityname.title()
+
+    city = City(cityname)
     logger.info("Getting {}'s restaurants...".format(city.name))
 
     if city.uri:
         city.start()
-        restaurants_uri = city.get_all_resturant_in_city()
-        print(restaurants_uri)
+        restaurant_URIs = city.get_all_resturant_in_city()
 
     else:
         print('{} city not found'.format(city.name))
         exit(1)
 
+
+if __name__ == '__main__':
+    main()
 ## db_ = TripAdvDatabase()
 ## db_.connect_to('tripadvisor','reveiws')
 ## db_.correct_reveiew_texts_for_csv()
