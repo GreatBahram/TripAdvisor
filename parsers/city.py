@@ -16,14 +16,6 @@ class City:
         self.name = ''
         self.Session = requests.session()
         self.uri = ''
-        self.city_page = ''
-        self.vacation_rentals_link = ''
-        self.hotels_link = ''
-        self.attration_link = ''
-        self.resturant_link = ''
-        self.hotels = []
-        self.resturants = []
-        self.vacation_rentals = []
 
     def set_city(self, name):
         self.trip_advisor = 'https://www.tripadvisor.ca'

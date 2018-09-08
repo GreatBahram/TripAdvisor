@@ -1,21 +1,45 @@
+import argparse
+import logging
+
 from parsers.city import City
 from parsers.hotel import Hotel
-from parsers.resturant import Resturant
+from parsers.restaurant import Restaurant
 from parsers.thingtodo import ThingToDo
 from parsers.user import User
 from parsers.vacationrental import VacationRental
 
 #from TripAdvDatabase import TripAdvDatabase
 
-city = City()
+# instantiate and config logger
+logger = logging.getLogger(__name__)
+logformat = '%(asctime)-12s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig( format=logformat, datefmt='%y/%m/%d %H-%M', level=logging.INFO)
+
+# instantiate and argument parser
+parser = argparse.ArgumentParser(description='a simple CLI for trip adviser information gathering',)
+parser.add_argument('cityname', help='City name cannot left be blank!')
+
+
+if __name__ == '__main__':
+    data = parser.parse_args()
+    cityname = data.cityname
+    city = City()
+    city.set_city('Tehran')
+    logger.info("Getting {}'s restaurants...".format(city.name))
+
+    if city.uri:
+        city.start()
+        restaurants_uri = city.get_all_resturant_in_city()
+        print(restaurants_uri)
+
+    else:
+        print('{} city not found'.format(city.name))
+        exit(1)
+
 ## db_ = TripAdvDatabase()
 ## db_.connect_to('tripadvisor','reveiws')
 ## db_.correct_reveiew_texts_for_csv()
 ## print("done")
-# city.set_city('Tehran')
-# if city.uri == '':
-#     print('cannot load paris page')
-#     exit(1)
 
 # city.start()
 # print(hamedan.get_all_resturant_in_city())
