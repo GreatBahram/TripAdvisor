@@ -3,7 +3,7 @@ import requests
 from lxml import html
 
 
-class ThingToDo:
+class ThingToDoParser:
     def set_database(self,database):
         self.database = database
 

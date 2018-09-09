@@ -4,7 +4,7 @@ from lxml import html
 from lxml.etree import tostring
 
 
-class Hotel:
+class HotelParser:
     def set_database(self,database):
         self.database = database
 

@@ -1,14 +1,15 @@
 import argparse
+import csv
 import logging
-import sys
 import os
+import sys
 
-from parsers.city import City
-from parsers.hotel import Hotel
-from parsers.restaurant import Restaurant
-from parsers.thingtodo import ThingToDo
-from parsers.user import User
-from parsers.vacationrental import VacationRental
+from parsers.city import CityParser
+from parsers.hotel import HotelParser
+from parsers.restaurant import RestaurantParser
+from parsers.thingtodo import ThingToDoParser
+from parsers.user import UserParser
+from parsers.vacationrental import VacationRentalParser
 
 #from TripAdvDatabase import TripAdvDatabase
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -26,20 +27,38 @@ def main():
 
     cityname = data.cityname.title()
 
-    city = City(cityname)
+    city = CityParser(cityname)
     logger.info("Getting {}'s restaurants...".format(city.name))
 
     if city.uri:
         city.start()
         current_city_path = os.path.join(CURRENT_PATH, 'data', city.name)
-        print(current_city_path)
         os.makedirs(current_city_path, exist_ok=True)
-        restaurant_URIs = city.get_all_resturant_in_city()
-
+        restaurant_links = city.get_all_resturant_in_city()
+        logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
+        restaurant_with_name = 0
+        for link in restaurant_links:
+            restaurant_parser = RestaurantParser(link)
+            restaurant_name = restaurant_parser.get_name()
+            logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
+            restaurant_reviews = restaurant_parser.get_all_reviews()
+            if restaurant_reviews:
+                filename =  restaurant_name + '.csv'
+                csv_file_path = os.path.join(current_city_path, filename)
+                csv_file = open('{}'.format(csv_file_path), mode='wt')
+                with csv_file:
+                    field_names = ['user_id', 'date', 'title', 'review_text']
+                    writer = csv.DictWriter(csv_file, fieldnames=field_names) 
+                    writer.writeheader()
+                    for review in restaurant_reviews:
+                        review_text = review['review_text']
+                        review_title = review['title']
+                        review_date = review['rating_date']
+                        review_userid = review['user_id']
+                        writer.writerow( { 'user_id' : review_userid, 'date': review_date, 'title': review_title, 'review_text': review_text, })
     else:
-        print('{} city not found'.format(city.name))
+        logger.info('{} city not found'.format(cityname))
         exit(1)
-
 
 if __name__ == '__main__':
     main()

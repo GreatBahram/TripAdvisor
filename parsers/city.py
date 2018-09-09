@@ -7,7 +7,7 @@ from lxml import html
 from lxml.etree import tostring
 
 
-class City:
+class CityParser:
     """ Parse all city things """
     def __init__(self, cityname):
         self.name = cityname
@@ -21,9 +21,9 @@ class City:
         self.resturants = []
         self.vacation_rentals = []
         self.uri = self._get_city_uri()
-        self.city_page = self._openpage(self.uri)
 
     def start(self):
+        self.city_page = self._openpage(self.uri)
         self._get_city_links()
 
     def _find_variable(self, text, variable):

@@ -4,7 +4,7 @@ from lxml import html
 from lxml.etree import tostring
 
 
-class VacationRental:
+class VacationRentalParser:
     """
     """
 
