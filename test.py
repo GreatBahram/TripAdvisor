@@ -1,8 +1,6 @@
 import argparse
-import csv
 import logging
 import os
-import sys
 
 from parsers.city import CityParser
 from parsers.hotel import HotelParser
@@ -11,7 +9,9 @@ from parsers.thingtodo import ThingToDoParser
 from parsers.user import UserParser
 from parsers.vacationrental import VacationRentalParser
 
-#from TripAdvDatabase import TripAdvDatabase
+# local imports
+from utils import return_logger, save_csv_file
+
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def main():
@@ -20,12 +20,9 @@ def main():
     parser.add_argument('cityname', help='City name cannot left be blank!')
     data = parser.parse_args()
 
-    # instantiate and config logger
-    logger = logging.getLogger(__name__)
-    logformat = '%(asctime)-12s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig( format=logformat, datefmt='%y/%m/%d %H-%M', level=logging.INFO)
 
     cityname = data.cityname.title()
+    logger = return_logger(__name__)
 
     city = CityParser(cityname)
     logger.info("Getting {}'s restaurants...".format(city.name))
@@ -43,19 +40,9 @@ def main():
             logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
             restaurant_reviews = restaurant_parser.get_all_reviews()
             if restaurant_reviews:
-                filename =  restaurant_name + '.csv'
+                filename =  restaurant_name 
                 csv_file_path = os.path.join(current_city_path, filename)
-                csv_file = open('{}'.format(csv_file_path), mode='wt')
-                with csv_file:
-                    field_names = ['user_id', 'date', 'title', 'review_text']
-                    writer = csv.DictWriter(csv_file, fieldnames=field_names) 
-                    writer.writeheader()
-                    for review in restaurant_reviews:
-                        review_text = review['review_text']
-                        review_title = review['title']
-                        review_date = review['rating_date']
-                        review_userid = review['user_id']
-                        writer.writerow( { 'user_id' : review_userid, 'date': review_date, 'title': review_title, 'review_text': review_text, })
+                save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
     else:
         logger.info('{} city not found'.format(cityname))
         exit(1)
