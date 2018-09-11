@@ -1,7 +1,10 @@
 import argparse
 import logging
 import os
+import sys
 from multiprocessing.dummy import Pool
+
+import redis
 
 from parsers.city import CityParser
 from parsers.hotel import HotelParser
@@ -16,18 +19,24 @@ from utils import return_logger, save_csv_file
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 current_city_path = ''
 
+redis_db = redis.StrictRedis(host='localhost', port=6379, db=0)
 logger = return_logger(__name__)
 
 def restaurant_helper(link):
     global current_city_path
     restaurant_parser = RestaurantParser(link)
     restaurant_name = restaurant_parser.get_name()
-    logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
-    restaurant_reviews = restaurant_parser.get_all_reviews()
-    if restaurant_reviews:
-        filename =  restaurant_name 
-        csv_file_path = os.path.join(current_city_path, filename)
-        save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
+    city_name = current_city_path.split('/')[-1].lower()
+    redis_output = redis_db.incr('{}'.format(restaurant_name + '@' +city_name))
+    if redis_output == 1:
+        logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
+        restaurant_reviews = restaurant_parser.get_all_reviews()
+        if restaurant_reviews:
+            filename =  restaurant_name 
+            csv_file_path = os.path.join(current_city_path, filename)
+            save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
+    elif redis_output > 1:
+        logger.info('Skip {} restaurant since it has already downloaded.'.format(restaurant_name))
 
 def main():
     # instantiate and argument parser
