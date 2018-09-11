@@ -27,15 +27,17 @@ def restaurant_helper(link):
     restaurant_parser = RestaurantParser(link)
     restaurant_name = restaurant_parser.get_name()
     city_name = current_city_path.split('/')[-1].lower()
-    redis_output = redis_db.incr('{}'.format(restaurant_name + '@' +city_name))
-    if redis_output == 1:
+    redis_output = redis_db.get('{}'.format(restaurant_name + '@' + city_name))
+    if not redis_output:
         logger.info('Getting reviews for {} restaurant...'.format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
+        redis_db.incr('{}'.format(restaurant_name + '@' + city_name))
         if restaurant_reviews:
             filename =  restaurant_name 
             csv_file_path = os.path.join(current_city_path, filename)
             save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
-    elif redis_output > 1:
+            logger.info(' -> Storing reviews for {} restaurant...'.format(restaurant_name))
+    else:
         logger.info('Skipping {} restaurant since it has already downloaded...'.format(restaurant_name))
 
 def main():
