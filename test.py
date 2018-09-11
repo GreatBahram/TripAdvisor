@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+from multiprocessing.dummy import Pool
 
 from parsers.city import CityParser
 from parsers.hotel import HotelParser
@@ -13,6 +14,20 @@ from parsers.vacationrental import VacationRentalParser
 from utils import return_logger, save_csv_file
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
+current_city_path = ''
+
+logger = return_logger(__name__)
+
+def restaurant_helper(link):
+    global current_city_path
+    restaurant_parser = RestaurantParser(link)
+    restaurant_name = restaurant_parser.get_name()
+    logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
+    restaurant_reviews = restaurant_parser.get_all_reviews()
+    if restaurant_reviews:
+        filename =  restaurant_name 
+        csv_file_path = os.path.join(current_city_path, filename)
+        save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
 
 def main():
     # instantiate and argument parser
@@ -20,29 +35,30 @@ def main():
     parser.add_argument('cityname', help='City name cannot left be blank!')
     data = parser.parse_args()
 
-
     cityname = data.cityname.title()
-    logger = return_logger(__name__)
 
     city = CityParser(cityname)
     logger.info("Getting {}'s restaurants...".format(city.name))
 
     if city.uri:
         city.start()
+        global current_city_path
         current_city_path = os.path.join(CURRENT_PATH, 'data', city.name)
         os.makedirs(current_city_path, exist_ok=True)
         restaurant_links = city.get_all_resturant_in_city()
         logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
-        restaurant_with_name = 0
-        for link in restaurant_links:
-            restaurant_parser = RestaurantParser(link)
-            restaurant_name = restaurant_parser.get_name()
-            logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
-            restaurant_reviews = restaurant_parser.get_all_reviews()
-            if restaurant_reviews:
-                filename =  restaurant_name 
-                csv_file_path = os.path.join(current_city_path, filename)
-                save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
+        pool = Pool(5)
+        results = pool.map(restaurant_helper, restaurant_links)
+
+        #for link in restaurant_links:
+        #    restaurant_parser = RestaurantParser(link)
+        #    restaurant_name = restaurant_parser.get_name()
+        #    logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
+        #    restaurant_reviews = restaurant_parser.get_all_reviews()
+        #    if restaurant_reviews:
+        #        filename =  restaurant_name 
+        #        csv_file_path = os.path.join(current_city_path, filename)
+        #        save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
     else:
         logger.info('{} city not found'.format(cityname))
         exit(1)
@@ -85,7 +101,6 @@ if __name__ == '__main__':
 # print(user.n_cities_visited)
 # print(user.n_helpful_votes)
 # print('user.from_city: ', user.from_city)
-
 
 # thing_to_do = ThingToDo()
 # thing_to_do.set_thing_to_do('https://www.tripadvisor.ca/Attraction_Review-g187147-d189796-Reviews-8th_Arrondissement-Paris_Ile_de_France.html')
