@@ -29,14 +29,14 @@ def restaurant_helper(link):
     city_name = current_city_path.split('/')[-1].lower()
     redis_output = redis_db.incr('{}'.format(restaurant_name + '@' +city_name))
     if redis_output == 1:
-        logger.info('Getting reviews for {} restaurant'.format(restaurant_name))
+        logger.info('Getting reviews for {} restaurant...'.format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
         if restaurant_reviews:
             filename =  restaurant_name 
             csv_file_path = os.path.join(current_city_path, filename)
             save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
     elif redis_output > 1:
-        logger.info('Skip {} restaurant since it has already downloaded.'.format(restaurant_name))
+        logger.info('Skipping {} restaurant since it has already downloaded...'.format(restaurant_name))
 
 def main():
     # instantiate and argument parser
