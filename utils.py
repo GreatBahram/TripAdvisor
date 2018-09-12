@@ -3,30 +3,24 @@ import logging
 import sys
 
 
-def save_csv_file(csv_file_path, restaurant_reviews, type_):
-    """
-    Save dictionaries as csv file
-        arguments:
-            csv_file_path: 
-            data:
-            type_: can be one of the ('restaurant', 'hotel', 'city', 'thingtodo', 'vacational_rental')
-        returns:
-            None
-    """
-    different_types = ('restaurant', 'hotel', 'city', 'thingtodo', 'vacational_rental')
-    if type_ in different_types:
+def save_csv_file(csv_file_path, data, type_):
+    """ Save dictionaries as csv file """
+
+    different_types = ('restaurant', 'hotel', 'city', 'thingtodo', 'vacational_rental', 'overall')
+    if type_ in different_types and data != []:
         csv_file_path = csv_file_path + '_' + type_ + '.csv'
         csv_file = open('{}'.format(csv_file_path), mode='wt')
-        with csv_file:
-            field_names = ['user_id', 'date', 'title', 'review_text']
-            writer = csv.DictWriter(csv_file, fieldnames=field_names) 
-            writer.writeheader()
-            for review in restaurant_reviews:
-                review_text = review['review_text']
-                review_title = review['title']
-                review_date = review['rating_date']
-                review_userid = review['user_id']
-                writer.writerow( { 'user_id' : review_userid, 'date': review_date, 'title': review_title, 'review_text': review_text, })
+        if type_ == 'overall': 
+            with csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=list(data.keys())) 
+                writer.writeheader()
+                writer.writerow(data)
+        elif type_ == 'restaurant':
+            with csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=list(data[0].keys())) 
+                writer.writeheader()
+                for review in data:
+                    writer.writerow(review)
     else:
         logger = return_logger(__name__)
         logger.error("Unknown type") 
