@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from bs4 import BeautifulSoup
 
-def overall_review_numbers(html_codes):
+def overall_review_numbers(html_codes, uri):
     """ """
     soup = BeautifulSoup(html_codes, 'html.parser')
     overall_dict = {
@@ -18,5 +18,7 @@ def overall_review_numbers(html_codes):
             overall_dict[key] = soup.select('.{} .contentCount'.format(overall_dict[key]))[0].getText().split()[0]
         except IndexError:
             overall_dict[key] = 0
+
+    overall_dict['URL'] = uri
 
     return overall_dict
