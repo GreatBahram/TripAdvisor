@@ -51,7 +51,7 @@ class RestaurantParser:
             data['review_text'] = review_text
             data['title'] = title
             data['user_id'] = user_id
-            data['rating_date'] = rating_date
+            data['date'] = rating_date
             output_list.append(data)
         return output_list
 
