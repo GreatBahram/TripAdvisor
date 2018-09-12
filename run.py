@@ -98,7 +98,7 @@ The most commonly used git commands are:
                 global current_city_path
                 current_city_path = os.path.join(CURRENT_PATH, 'data', 'overall')
                 os.makedirs(current_city_path, exist_ok=True)
-                overall_result = overall_review_numbers(data, city.uri)
+                overall_result = overall_review_numbers(data, city.uri, cityname)
                 current_city_path = os.path.join(current_city_path, cityname)
                 save_csv_file(current_city_path, overall_result, 'overall')
                 logger.info('Overall information is {}'.format(overall_result))

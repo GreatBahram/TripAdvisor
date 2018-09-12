@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from bs4 import BeautifulSoup
 
-def overall_review_numbers(html_codes, uri):
+def overall_review_numbers(html_codes, uri, city):
     """ """
     soup = BeautifulSoup(html_codes, 'html.parser')
     overall_dict = {
@@ -20,5 +20,6 @@ def overall_review_numbers(html_codes, uri):
             overall_dict[key] = 0
 
     overall_dict['URL'] = uri
+    overall_dict['city'] = city
 
     return overall_dict
