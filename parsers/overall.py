@@ -2,8 +2,6 @@ from collections import namedtuple
 
 from bs4 import BeautifulSoup
 
-OverallReviews = namedtuple('OverallReviews', 'hotels forum restaurants flights thingstodo vacationalrentals')
-
 def overall_review_numbers(html_codes):
     """ """
     soup = BeautifulSoup(html_codes, 'html.parser')
@@ -21,4 +19,4 @@ def overall_review_numbers(html_codes):
         except IndexError:
             overall_dict[key] = 0
 
-    return OverallReviews(**overall_dict)
+    return overall_dict
