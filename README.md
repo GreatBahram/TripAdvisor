@@ -25,4 +25,6 @@ $ virtualenv venv
 $ . venv/bin/activate
 $ pip3 install -r requirements.txt 
 $ python3 run.py -h
+$ python3 run.py overall lima tokyo riyadh vienna shanghai taipei
+$ python3 run.py restaurant london paris melbourne
 ```
