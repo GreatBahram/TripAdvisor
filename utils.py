@@ -34,3 +34,15 @@ def return_logger(module_name):
     logging.basicConfig( format=logformat, datefmt='%y/%m/%d %H-%M-%S', level=logging.INFO)
 
     return logger
+
+def remove_parenthesis(dictionary):
+    """ remove () from the value"""
+    for key in dictionary:
+        value = dictionary[key]
+        if type(value) == str:
+            new_value = value.replace('(', '')
+            new_value = new_value.replace(')', '')
+            dictionary[key] = new_value
+        else:
+            continue
+    return dictionary

@@ -9,7 +9,7 @@ import redis
 from parsers.city import CityParser
 from parsers.overall import overall_review_numbers
 from parsers.restaurant import RestaurantParser
-from utils import return_logger, save_csv_file
+from utils import return_logger, save_csv_file, remove_parenthesis
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 current_city_path = ''
@@ -25,7 +25,7 @@ def restaurant_helper(link):
     city_name = current_city_path.split('/')[-1].lower()
     redis_output = redis_db.get('{}'.format(restaurant_name + '@' + city_name))
     if not redis_output:
-        logger.info('Getting reviews for {} restaurant...'.format(restaurant_name))
+        logger.info("Getting {}'s restaurant data...".format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
         redis_db.incr('{}'.format(restaurant_name + '@' + city_name))
         if restaurant_reviews:
@@ -99,9 +99,10 @@ The most commonly used trip advisor commands are:
                 current_city_path = os.path.join(CURRENT_PATH, 'data', 'overall')
                 os.makedirs(current_city_path, exist_ok=True)
                 overall_result = overall_review_numbers(data, city.uri, cityname)
+                overall_result = remove_parentheses(overall_result)
                 current_city_path = os.path.join(current_city_path, cityname)
                 save_csv_file(current_city_path, overall_result, 'overall')
-                logger.info('Overall information is {}'.format(overall_result))
+                print('\n'.join(" - {}: {}".format(key, value) for key, value in overall_result.items()))
         else:
             logger.info('{} city not found'.format(cityname))
             exit(1)
