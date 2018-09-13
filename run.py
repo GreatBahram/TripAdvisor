@@ -42,17 +42,17 @@ class TripCli(object):
         parser = argparse.ArgumentParser(
             description='Trip Advisor cli',
             usage='''test.py <command> [<cityname>]
-The most commonly used git commands are:
-   restaurant     Record changes to the repository
-   overall      Download objects and refs from another repository
+The most commonly used trip advisor commands are:
+   restaurant     Gather all reviews for given city
+   overall      Gather overall information for each city
 ''')
         parser.add_argument('command', help='Subcommand to run')
         # parse_args defaults to [1:] for args, but you need to
         # exclude the rest of the args too, or validation will fail
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
-            print('Unrecognized command')
-            parser.print_help()
+            logger.error('Unrecognized command')
+            #parser.print_help()
             exit(1)
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()

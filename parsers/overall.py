@@ -7,13 +7,13 @@ def overall_review_numbers(html_codes, uri, city):
     soup = BeautifulSoup(html_codes, 'html.parser')
     overall_dict = {
             'num_of_vactionalrentals': '.vacationrentals  .typeQty',
-            'vacationalrentals': '.vacationrentals .contentCount',
+            'vacationalrentals_reviews': '.vacationrentals .contentCount',
             'num_of_restaurants': '.restaurants .typeQty',
-            'restaurants': '.restaurants .contentCount',
+            'restaurants_reviews': '.restaurants .contentCount',
             'num_of_hotels': '.hotels .typeQty',
-            'hotels': '.hotels .contentCount',
+            'hotels_reviews': '.hotels .contentCount',
             'num_of_thingstodo': '.attractions  .typeQty',
-            'thingstodo': '.attractions .contentCount',
+            'thingstodo_reviews': '.attractions .contentCount',
             'forum': '.forum .contentCount',
             'flights': '.flights .contentCount', 
             }
