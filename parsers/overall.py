@@ -1,13 +1,11 @@
-from collections import namedtuple
-
 from bs4 import BeautifulSoup
 
 def overall_review_numbers(html_codes, uri, city):
     """ """
     soup = BeautifulSoup(html_codes, 'html.parser')
     overall_dict = {
-            'num_of_vactionalrentals': '.vacationrentals  .typeQty',
-            'vacationalrentals_reviews': '.vacationrentals .contentCount',
+            'num_of_vactionalrentals': '.vacationRentals  .typeQty',
+            'vacationalrentals_reviews': '.vacationRentals .contentCount',
             'num_of_restaurants': '.restaurants .typeQty',
             'restaurants_reviews': '.restaurants .contentCount',
             'num_of_hotels': '.hotels .typeQty',

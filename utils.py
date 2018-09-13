@@ -1,5 +1,6 @@
 import csv
 import logging
+import os
 import sys
 
 
@@ -8,14 +9,23 @@ def save_csv_file(csv_file_path, data, type_):
 
     different_types = ('restaurant', 'hotel', 'city', 'thingtodo', 'vacational_rental', 'overall')
     if type_ in different_types and data != []:
-        csv_file_path = csv_file_path + '_' + type_ + '.csv'
-        csv_file = open('{}'.format(csv_file_path), mode='wt')
         if type_ == 'overall': 
+            csv_file_path = csv_file_path + '.csv'
+            skip = False
+            if os.path.exists(csv_file_path):
+                csv_file = open('{}'.format(csv_file_path), mode='at')
+                skip = True
+            else:
+                csv_file = open('{}'.format(csv_file_path), mode='wt')
+
             with csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=list(data.keys())) 
-                writer.writeheader()
+                if not skip:
+                    writer.writeheader()
                 writer.writerow(data)
         elif type_ == 'restaurant':
+            csv_file_path = csv_file_path + '_' + type_ + '.csv'
+            csv_file = open('{}'.format(csv_file_path), mode='wt')
             with csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=list(data[0].keys())) 
                 writer.writeheader()

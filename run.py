@@ -9,7 +9,7 @@ import redis
 from parsers.city import CityParser
 from parsers.overall import overall_review_numbers
 from parsers.restaurant import RestaurantParser
-from utils import return_logger, save_csv_file, remove_parenthesis
+from utils import remove_parenthesis, return_logger, save_csv_file
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 current_city_path = ''
@@ -25,7 +25,7 @@ def restaurant_helper(link):
     city_name = current_city_path.split('/')[-1].lower()
     redis_output = redis_db.get('{}'.format(restaurant_name + '@' + city_name))
     if not redis_output:
-        logger.info("Getting {}'s restaurant data...".format(restaurant_name))
+        logger.info("Getting {}'s data...".format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
         redis_db.incr('{}'.format(restaurant_name + '@' + city_name))
         if restaurant_reviews:
@@ -59,53 +59,53 @@ The most commonly used trip advisor commands are:
 
     def restaurant(self):
         parser = argparse.ArgumentParser( description='Gather restaurant information for given city')
-        parser.add_argument('cityname', help='City name cannot left be blank!')
+        parser.add_argument('cityname', help='City name cannot left be blank!', nargs='*')
         args = parser.parse_args(sys.argv[2:])
 
-        cityname = args.cityname.title()
+        for city in args.cityname:
+            cityname = city.title()
 
-        city = CityParser(cityname)
-        logger.info("Getting {}'s restaurants...".format(city.name))
+            city_parser = CityParser(cityname)
+            logger.info("Getting {}'s restaurants...".format(city_parser.name))
 
-        if city.uri:
-            city.start()
-            global current_city_path
-            current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', city.name)
-            os.makedirs(current_city_path, exist_ok=True)
-            restaurant_links = city.get_all_resturant_in_city()
-            logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
-            pool = Pool(5)
-            results = pool.map(restaurant_helper, restaurant_links)
-
-        else:
-            logger.info('{} city not found'.format(cityname))
-            exit(1)
+            if city_parser.uri:
+                city_parser.start()
+                global current_city_path
+                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', city_parser.name)
+                os.makedirs(current_city_path, exist_ok=True)
+                restaurant_links = city_parser.get_all_resturant_in_city()
+                logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
+                pool = Pool(5)
+                results = pool.map(restaurant_helper, restaurant_links)
+            else:
+                logger.info('{} city not found'.format(cityname))
+                exit(1)
 
     def overall(self):
         parser = argparse.ArgumentParser(
             description='overall information about the city ')
         # NOT prefixing the argument with -- means it's not optional
-        parser.add_argument('cityname')
+        parser.add_argument('cityname', help='city cannot left be blank!', nargs='*')
         args = parser.parse_args(sys.argv[2:])
-        cityname = args.cityname.title()
+        for city in args.cityname:
+            cityname = city.title()
+            city_parser = CityParser(cityname)
+            logger.info("Getting {}'s restaurants...".format(city_parser.name))
 
-        city = CityParser(cityname)
-        logger.info("Getting {}'s restaurants...".format(city.name))
-
-        if city.uri:
-            data = city._openpage(city.uri)
-            if data:
-                global current_city_path
-                current_city_path = os.path.join(CURRENT_PATH, 'data', 'overall')
-                os.makedirs(current_city_path, exist_ok=True)
-                overall_result = overall_review_numbers(data, city.uri, cityname)
-                overall_result = remove_parentheses(overall_result)
-                current_city_path = os.path.join(current_city_path, cityname)
-                save_csv_file(current_city_path, overall_result, 'overall')
-                print('\n'.join(" - {}: {}".format(key, value) for key, value in overall_result.items()))
-        else:
-            logger.info('{} city not found'.format(cityname))
-            exit(1)
+            if city_parser.uri:
+                data = city_parser._openpage(city_parser.uri)
+                if data:
+                    global current_city_path
+                    current_city_path = os.path.join(CURRENT_PATH, 'data', 'overall') 
+                    os.makedirs(current_city_path, exist_ok=True)
+                    overall_result = overall_review_numbers(data, city_parser.uri, cityname)
+                    overall_result = remove_parenthesis(overall_result)
+                    current_city_path = os.path.join(current_city_path, 'overall') 
+                    save_csv_file(current_city_path, overall_result, 'overall')
+                    print('\n'.join(" - {}: {}".format(key, value) for key, value in overall_result.items()))
+            else:
+                logger.info('{} city not found'.format(cityname))
+                exit(1)
 
 if __name__ == '__main__':
     TripCli()
