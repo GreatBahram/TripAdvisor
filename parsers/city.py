@@ -1,8 +1,8 @@
 import json
+import re
 import time
 
 import requests
-
 from lxml import html
 from lxml.etree import tostring
 
@@ -18,6 +18,7 @@ class CityParser:
         self.attration_link = ''
         self.resturant_link = ''
         self.hotels = []
+        self.pattern = r'^/Tourism-.*'
         self.resturants = []
         self.vacation_rentals = []
         self.uri = self._get_city_uri()
@@ -53,9 +54,17 @@ class CityParser:
                          + search_session_id
         fetched_cities = self.Session.get(fetch_city_url)
         data = json.loads(fetched_cities.text)
+        output = ''
         if 'results' in data:
             if len(data.get("results")) != 0:
-                return self.trip_advisor + data.get("results")[0]['url']
+                first_url = data.get("results")[0]['url']
+                second_url = data.get('results')[1].get('urls')[0]['url']
+                if re.findall(self.pattern, first_url):
+                    output = first_url
+                elif re.findall(self.pattern, second_url):
+                    output = second_url
+                if output:
+                    return self.trip_advisor + output
         return None
 
     def _openpage(self, uri):
