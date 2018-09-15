@@ -23,16 +23,13 @@ def restaurant_helper(link):
     restaurant_parser = RestaurantParser(link)
     restaurant_name = restaurant_parser.get_name()
     city_name = current_city_path.split('/')[-1].lower()
-    redis_output = redis_db.get('{}'.format(restaurant_name + '@' + city_name))
-    if not redis_output:
+    if not redis_db.sismember('{}:'.format(city_name), restaurant_name):
         logger.info("Getting {}'s data...".format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
-        redis_db.incr('{}'.format(restaurant_name + '@' + city_name))
+        redis_db.sadd('{}:'.format(city_name), restaurant_name)
         if restaurant_reviews:
-            filename =  restaurant_name 
-            csv_file_path = os.path.join(current_city_path, filename)
-            save_csv_file(csv_file_path, restaurant_reviews, 'restaurant')
             logger.info(' -> Storing reviews for {} restaurant...'.format(restaurant_name))
+            return restaurant_reviews
     else:
         logger.info('Skipping {} restaurant since it has already downloaded...'.format(restaurant_name))
 
@@ -63,7 +60,7 @@ The most commonly used trip advisor commands are:
         args = parser.parse_args(sys.argv[2:])
 
         for city in args.cityname:
-            cityname = city.title()
+            cityname = city.lower()
 
             city_parser = CityParser(cityname)
             logger.info("Getting {}'s restaurants...".format(city_parser.name))
@@ -71,12 +68,15 @@ The most commonly used trip advisor commands are:
             if city_parser.uri:
                 city_parser.start()
                 global current_city_path
-                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', city_parser.name)
+                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant')
                 os.makedirs(current_city_path, exist_ok=True)
                 restaurant_links = city_parser.get_all_resturant_in_city()
                 logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
                 pool = Pool(5)
                 results = pool.map(restaurant_helper, restaurant_links)
+                for result in results:
+                    if result:
+                        save_csv_file(current_city_path, result, 'restaurant', city=cityname)
             else:
                 logger.info('{} city not found'.format(cityname))
                 exit(1)
