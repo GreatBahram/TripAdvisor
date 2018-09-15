@@ -68,12 +68,13 @@ The most commonly used trip advisor commands are:
             if city_parser.uri:
                 city_parser.start()
                 global current_city_path
-                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant')
-                os.makedirs(current_city_path, exist_ok=True)
                 restaurant_links = city_parser.get_all_resturant_in_city()
                 logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
+                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname)
                 pool = Pool(5)
                 results = pool.map(restaurant_helper, restaurant_links)
+                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant')
+                os.makedirs(current_city_path, exist_ok=True)
                 for result in results:
                     if result:
                         save_csv_file(current_city_path, result, 'restaurant', city=cityname)
