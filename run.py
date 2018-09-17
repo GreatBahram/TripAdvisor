@@ -1,4 +1,5 @@
 import argparse
+import glob
 import os
 import sys
 from multiprocessing.dummy import Pool
@@ -29,12 +30,13 @@ def restaurant_helper(link):
         redis_db.sadd('{}:'.format(city_name), restaurant_name)
         if restaurant_reviews:
             logger.info(' -> Storing reviews for {} restaurant...'.format(restaurant_name))
-            return restaurant_reviews
+            csv_file_path = os.path.join(current_city_path, restaurant_name)
+            save_csv_file(csv_file_path, restaurant_reviews, 'restaurant', city=city_name)
     else:
         logger.info('Skipping {} restaurant since it has already downloaded...'.format(restaurant_name))
 
 
-class TripCli(object):
+class TripCli():
     def __init__(self):
         parser = argparse.ArgumentParser(
             description='Trip Advisor cli',
@@ -71,13 +73,21 @@ The most commonly used trip advisor commands are:
                 restaurant_links = city_parser.get_all_resturant_in_city()
                 logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
                 current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname)
-                pool = Pool(5)
-                results = pool.map(restaurant_helper, restaurant_links)
-                current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant')
                 os.makedirs(current_city_path, exist_ok=True)
-                for result in results:
-                    if result:
-                        save_csv_file(current_city_path, result, 'restaurant', city=cityname)
+                pool = Pool(5)
+                pool.map(restaurant_helper, restaurant_links)
+                integrated_reviews = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname) + '.csv'
+                all_csv_files = os.path.join(current_city_path, '*.csv')
+                with open(integrated_reviews, mode='wt') as output_file:
+                    output_file.write('city,restaurant,title,review_text,user_id,date\n')
+                    for csv_file in glob.glob(all_csv_files):
+                        with open(csv_file, mode='rt') as input_file:
+                            next(input_file, None)
+                            for line in input_file:
+                                output_file.write(line)
+                for csv_file in glob.glob(all_csv_files):
+                    os.remove(csv_file)
+                os.rmdir(current_city_path)
             else:
                 logger.info('{} city not found'.format(cityname))
                 exit(1)
