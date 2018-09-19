@@ -4,7 +4,7 @@ import os
 import sys
 
 
-def save_csv_file(csv_file_path, data, type_):
+def save_csv_file(csv_file_path, data, type_, city=None):
     """ Save dictionaries as csv file """
 
     different_types = ('restaurant', 'hotel', 'city', 'thingtodo', 'vacational_rental', 'overall')
@@ -24,12 +24,21 @@ def save_csv_file(csv_file_path, data, type_):
                     writer.writeheader()
                 writer.writerow(data)
         elif type_ == 'restaurant':
-            csv_file_path = csv_file_path + '_' + type_ + '.csv'
-            csv_file = open('{}'.format(csv_file_path), mode='wt')
+            csv_file_path = csv_file_path + '.csv'
+            skip = False
+
+            if os.path.exists(csv_file_path):
+                csv_file = open('{}'.format(csv_file_path), mode='at')
+                skip = True
+            else:
+                csv_file = open('{}'.format(csv_file_path), mode='wt')
+
             with csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=list(data[0].keys())) 
-                writer.writeheader()
+                writer = csv.DictWriter(csv_file, fieldnames=['city', 'restaurant', 'title', 'review_text', 'user_id', 'date']) 
+                if not skip:
+                    writer.writeheader()
                 for review in data:
+                    review['city'] = city
                     writer.writerow(review)
     else:
         logger = return_logger(__name__)
