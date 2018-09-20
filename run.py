@@ -27,11 +27,11 @@ def restaurant_helper(link):
     if not redis_db.sismember('{}:'.format(city_name), restaurant_name):
         logger.info("Getting {}'s data...".format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
-        redis_db.sadd('{}:'.format(city_name), restaurant_name)
         if restaurant_reviews:
             logger.info(' -> Storing reviews for {} restaurant...'.format(restaurant_name))
             csv_file_path = os.path.join(current_city_path, restaurant_name)
             save_csv_file(csv_file_path, restaurant_reviews, 'restaurant', city=city_name)
+        redis_db.sadd('{}:'.format(city_name), restaurant_name)
     else:
         logger.info('Skipping {} restaurant since it has already downloaded...'.format(restaurant_name))
 
