@@ -38,8 +38,9 @@ def save_csv_file(csv_file_path, data, type_, city=None):
                 if not skip:
                     writer.writeheader()
                 for review in data:
-                    review['city'] = city
-                    writer.writerow(review)
+                    review_asdict = dict(review._asdict())
+                    review_asdict['city'] = city
+                    writer.writerow(review_asdict)
     else:
         logger = return_logger(__name__)
         logger.error("Unknown type") 

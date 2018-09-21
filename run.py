@@ -9,7 +9,8 @@ import redis
 # local imports
 from parsers.city import CityParser
 from parsers.overall import overall_review_numbers
-from parsers.restaurant import RestaurantParser
+#from parsers.restaurant import RestaurantParser
+from parsers.new_restaurant import RestaurantParser
 from utils import remove_parenthesis, return_logger, save_csv_file
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
