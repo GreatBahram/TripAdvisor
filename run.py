@@ -1,12 +1,14 @@
+# Standard library imports
 import argparse
 import glob
 import os
 import sys
 from multiprocessing.dummy import Pool
 
+# Third party imports
 import redis
 
-# local imports
+# Local imports
 from parsers.city import CityParser
 from parsers.overall import overall_review_numbers
 from parsers.restaurant import RestaurantParser
