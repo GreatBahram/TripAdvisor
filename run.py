@@ -17,7 +17,7 @@ current_city_path = ''
 
 logger = return_logger(__name__)
 
-redis_db = redis.StrictRedis(host='localhost', port=6379, db=0)
+redis_db = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
 
 def restaurant_helper(link):
     global current_city_path
@@ -70,7 +70,12 @@ The most commonly used trip advisor commands are:
             if city_parser.uri:
                 city_parser.start()
                 global current_city_path
-                restaurant_links = city_parser.get_all_resturant_in_city()
+                redis_list_name = '{}:links'.format(cityname)
+                if redis_db.llen(redis_list_name):
+                    restaurant_links = redis_db.lrange(redis_list_name, 0 , -1)
+                else:
+                    restaurant_links = city_parser.get_all_resturant_in_city()
+                    redis_db.lpush(redis_list_name, *restaurant_links)
                 logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
                 current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname)
                 os.makedirs(current_city_path, exist_ok=True)
