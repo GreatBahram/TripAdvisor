@@ -9,10 +9,17 @@ Current features:
 
 ## How do I use this?
 
-For installation instructions head to the official documentation:
+For installation follow the instructions below:
 
-* [Installation](#)
-* [Quickstart](#)
+* [Requirements](#):
+
+  * Python3
+
+  * Redis Server: Redis has been used to cache the data for avoiding downloading them again and again.
+
+    ```bash
+    sudo apt install redis-server python3 python3-pip
+    ```
 
 ## Want to develop on TripAdvisor?
 
