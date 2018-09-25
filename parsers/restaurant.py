@@ -54,7 +54,7 @@ class RestaurantParser:
         for review in reviews:
             data = {}
             data['review_text'] = review.select_one('.partial_entry').getText()
-            data['rating'] = self._return_rating_code(review.select_one('.ui_bubble_rating').attrs['class'][1])
+            data['rate'] = self._return_rating_code(review.select_one('.ui_bubble_rating').attrs['class'][1])
             data['user_id'] = review.select_one('.avatar').attrs['class'][-1]
             data['title'] = review.select_one('.noQuotes').getText()
             data['date'] = review.select_one('.ratingDate').attrs['title']
