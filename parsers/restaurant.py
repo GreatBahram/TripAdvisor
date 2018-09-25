@@ -32,6 +32,21 @@ class RestaurantParser:
         except Exception as e:
             return None
 
+    def _return_rating_code(self, class_):
+        rating_code = {
+                'bubble_50': '5.0',
+                'bubble_45': '4.5',
+                'bubble_40': '4.0',
+                'bubble_35': '3.5',
+                'bubble_30': '3.0',
+                'bubble_25': '2.5',
+                'bubble_20': '2.0',
+                'bubble_15': '1.5',
+                'bubble_10': '1.0',
+                'bubble_05': '0.5',
+                }
+        return rating_code.get(class_, 'N/A')
+
     def get_restaurant_views_in_this_page(self, page):
         output_list = []
         soup = BeautifulSoup(page.text, 'lxml')
@@ -39,6 +54,7 @@ class RestaurantParser:
         for review in reviews:
             data = {}
             data['review_text'] = review.select_one('.partial_entry').getText()
+            data['rating'] = self._return_rating_code(review.select_one('.ui_bubble_rating').attrs['class'][1])
             data['user_id'] = review.select_one('.avatar').attrs['class'][-1]
             data['title'] = review.select_one('.noQuotes').getText()
             data['date'] = review.select_one('.ratingDate').attrs['title']
