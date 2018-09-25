@@ -5,16 +5,16 @@ This project is a simple Python program which is designed to scrape information 
 Current features:
 
 * **Overall** information: which returns the following data for each city:
-   * number of vactional rentals
-   * number of vacational rentals' reviews
-   * number of restaurants
-   * number of restaurants' reviews
-   * number of hotels
-   * number of hotels' reviews
-   * number of things to do
-   * number of things to do reviews
-   * number of forum's question
-   * number of flight
+   * Number of vactional rentals
+   * Number of vacational rentals' reviews
+   * Number of restaurants
+   * Number of restaurants' reviews
+   * Number of hotels
+   * Number of hotels' reviews
+   * Number of things to do
+   * Number of things to do reviews
+   * Number of forum's question
+   * Number of flight
 * **Restaurant** information: This feature extracts the following data for each review in restaurant:
    * Username
    * Date
