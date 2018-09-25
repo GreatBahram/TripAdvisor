@@ -35,7 +35,7 @@ def save_csv_file(csv_file_path, data, type_, city=None):
                 csv_file = open('{}'.format(csv_file_path), mode='wt')
 
             with csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=['city', 'restaurant','user_id', 'date', 'title', 'review_text', 'rate']) 
+                writer = csv.DictWriter(csv_file, fieldnames=['city', 'restaurant','user_id', 'date', 'rate', 'title', 'review_text']) 
                 if not skip:
                     writer.writeheader()
                 for review in data:
