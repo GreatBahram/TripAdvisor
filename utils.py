@@ -8,11 +8,11 @@ import sys
 def save_csv_file(csv_file_path, data, type_, city=None):
     """ Save dictionaries as csv file """
 
+    skip = False
     different_types = ('restaurant', 'hotel', 'city', 'thingtodo', 'vacational_rental', 'overall')
     if type_ in different_types and data != []:
         if type_ == 'overall': 
             csv_file_path = csv_file_path + '.csv'
-            skip = False
             if os.path.exists(csv_file_path):
                 csv_file = open('{}'.format(csv_file_path), mode='at')
                 skip = True
@@ -26,8 +26,6 @@ def save_csv_file(csv_file_path, data, type_, city=None):
                 writer.writerow(data)
         elif type_ == 'restaurant':
             csv_file_path = csv_file_path + '.csv'
-            skip = False
-
             if os.path.exists(csv_file_path):
                 csv_file = open('{}'.format(csv_file_path), mode='at')
                 skip = True
@@ -36,6 +34,21 @@ def save_csv_file(csv_file_path, data, type_, city=None):
 
             with csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=['city', 'restaurant','user_id', 'date', 'rate', 'title', 'review_text']) 
+                if not skip:
+                    writer.writeheader()
+                for review in data:
+                    review['city'] = city
+                    writer.writerow(review)
+        elif type_ == 'hotel':
+            csv_file_path = csv_file_path + '.csv'
+            if os.path.exists(csv_file_path):
+                csv_file = open('{}'.format(csv_file_path), mode='at')
+                skip = True
+            else:
+                csv_file = open('{}'.format(csv_file_path), mode='wt')
+
+            with csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=['city', 'hotel','user_id', 'review_date', 'stayed_date', 'rate', 'title', 'review_text']) 
                 if not skip:
                     writer.writeheader()
                 for review in data:

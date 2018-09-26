@@ -12,6 +12,9 @@ class RestaurantParser:
         self.name = self.get_name()
         self.session = requests.session()
 
+    def __repr__(self):
+        return "<RestaurantParser: {}>".format(self.get_name())
+
     def open_restaurant_page(self, restaurant_link):
         try:
             response_restaurant_page = self.session.get(restaurant_link).text
