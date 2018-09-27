@@ -1,8 +1,11 @@
+# Standard library imports
 import json
 import re
 import time
 
+# Third party imports
 import requests
+
 from lxml import html
 from lxml.etree import tostring
 
@@ -22,6 +25,9 @@ class CityParser:
         self.resturants = []
         self.vacation_rentals = []
         self.uri = self._get_city_uri()
+
+    def __repr__(self):
+        return "<CityParser:>"
 
     def start(self):
         self.city_page = self._openpage(self.uri)
