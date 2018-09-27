@@ -66,7 +66,7 @@ class HotelParser:
             output_list.append(data)
         return output_list
 
-    def get_all_hotel_reviews(self):
+    def get_all_reviews(self):
         post_data, get_data = self.open_hotel_page(self.hotel_link)
         list_views = self.get_hotel_views_in_this_page(post_data)
         try:

@@ -27,16 +27,32 @@ def restaurant_helper(link):
     restaurant_parser = RestaurantParser(link)
     restaurant_name = restaurant_parser.get_name()
     city_name = current_city_path.split('/')[-1].lower()
-    if not redis_db.sismember('{}:'.format(city_name), restaurant_name):
+    if not redis_db.sismember('{}_restaurnat:'.format(city_name), restaurant_name):
         logger.info("Getting {}'s data...".format(restaurant_name))
         restaurant_reviews = restaurant_parser.get_all_reviews()
         if restaurant_reviews:
             logger.info(' -> Storing reviews for {} restaurant...'.format(restaurant_name))
             csv_file_path = os.path.join(current_city_path, restaurant_name)
             save_csv_file(csv_file_path, restaurant_reviews, 'restaurant', city=city_name)
-        redis_db.sadd('{}:'.format(city_name), restaurant_name)
+        redis_db.sadd('{}_restaurnat:'.format(city_name), restaurant_name)
     else:
         logger.info('Skipping {} restaurant since it has already downloaded...'.format(restaurant_name))
+
+def hotel_helper(link):
+    global current_city_path
+    hotel_parser = HotelParser(link)
+    hotel_name = hotel_parser.get_name()
+    city_name = current_city_path.split('/')[-1].lower()
+    if not redis_db.sismember('{}_hotel:'.format(city_name), hotel_name):
+        logger.info("Getting {}'s data...".format(hotel_name))
+        hotel_reviews = hotel_parser.get_all_reviews()
+        if hotel_reviews:
+            logger.info(' -> Storing reviews for {} restaurant...'.format(hotel_name))
+            csv_file_path = os.path.join(current_city_path, hotel_name)
+            save_csv_file(csv_file_path, hotel_reviews, 'hotel', city=city_name)
+        redis_db.sadd('{}_hotel:'.format(city_name), hotel_name)
+    else:
+        logger.info('Skipping {} restaurant since it has already downloaded...'.format(hotel_name))
 
 
 class TripCli():
@@ -47,6 +63,7 @@ class TripCli():
 The most commonly used trip advisor commands are:
    restaurant     Gather all reviews for given city
    overall      Gather overall information for each city
+   hotel      Gather hotel information for each city
 ''')
         parser.add_argument('command', help='Subcommand to run')
         # parse_args defaults to [1:] for args, but you need to
@@ -70,7 +87,7 @@ The most commonly used trip advisor commands are:
             if city_parser.uri:
                 city_parser.start()
                 global current_city_path
-                redis_list_name = '{}:restaurant:links'.format(cityname)
+                redis_list_name = '{}_restaurant:links'.format(cityname)
                 if redis_db.llen(redis_list_name):
                     restaurant_links = redis_db.lrange(redis_list_name, 0 , -1)
                 else:
@@ -134,15 +151,32 @@ The most commonly used trip advisor commands are:
             if city_parser.uri:
                 city_parser.start()
                 global current_city_path
-                redis_list_name = '{}:hotel:links'.format(cityname)
+                redis_list_name = '{}_hotel:links'.format(cityname)
                 if redis_db.llen(redis_list_name):
                     hotel_links = redis_db.lrange(redis_list_name, 0 , -1)
                 else:
-                    hotel_links = city_parser.get_all_hotel_in_city()
+                    hotel_links = city_parser.get_all_hotels_in_city()
                     redis_db.lpush(redis_list_name, *hotel_links)
                 logger.info('Total hotel in {} is : {}'.format(cityname, len(hotel_links)))
                 current_city_path = os.path.join(CURRENT_PATH, 'data', 'hotel', cityname)
                 os.makedirs(current_city_path, exist_ok=True)
+                pool = Pool(5)
+                pool.map(hotel_helper, hotel_links)
+                integrated_reviews = os.path.join(CURRENT_PATH, 'data', 'hotel', cityname) + '.csv'
+                all_csv_files = os.path.join(current_city_path, '*.csv')
+                with open(integrated_reviews, mode='wt') as output_file:
+                    output_file.write('city,restaurant,user_id,date,rate,title,review_text\n')
+                    for csv_file in glob.glob(all_csv_files):
+                        with open(csv_file, mode='rt') as input_file:
+                            next(input_file, None)
+                            for line in input_file:
+                                output_file.write(line)
+                for csv_file in glob.glob(all_csv_files):
+                    os.remove(csv_file)
+                os.rmdir(current_city_path)
+            else:
+                logger.info('{} city not found'.format(cityname))
+                exit(1)
 
 if __name__ == '__main__':
     TripCli()

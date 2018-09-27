@@ -21,6 +21,7 @@ Current features:
    * Title
    * Review Text
    * Rate
+* **Hotel** information: This feature extracts the following data for each review on the hotel:
 
 ## How do I use this?
 
