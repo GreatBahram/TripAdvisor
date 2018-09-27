@@ -10,6 +10,7 @@ import redis
 
 # Local imports
 from parsers.city import CityParser
+from parsers.hotel import HotelParser
 from parsers.overall import overall_review_numbers
 from parsers.restaurant import RestaurantParser
 from utils import remove_parenthesis, return_logger, save_csv_file
@@ -62,17 +63,14 @@ The most commonly used trip advisor commands are:
         parser = argparse.ArgumentParser( description='Gather restaurant information for given city')
         parser.add_argument('cityname', help='City name cannot left be blank!', nargs='*')
         args = parser.parse_args(sys.argv[2:])
-
         for city in args.cityname:
             cityname = city.lower()
-
             city_parser = CityParser(cityname)
             logger.info("Getting {}'s restaurants...".format(city_parser.name))
-
             if city_parser.uri:
                 city_parser.start()
                 global current_city_path
-                redis_list_name = '{}:links'.format(cityname)
+                redis_list_name = '{}:restaurant:links'.format(cityname)
                 if redis_db.llen(redis_list_name):
                     restaurant_links = redis_db.lrange(redis_list_name, 0 , -1)
                 else:
@@ -124,6 +122,27 @@ The most commonly used trip advisor commands are:
             else:
                 logger.info('{} city not found'.format(cityname))
                 exit(1)
+
+    def hotel(self):
+        parser = argparse.ArgumentParser( description='Gather hotel information for given city')
+        parser.add_argument('cityname', help='City name cannot left be blank!', nargs='*')
+        args = parser.parse_args(sys.argv[2:])
+        for city in args.cityname:
+            cityname = city.lower()
+            city_parser = CityParser(cityname)
+            logger.info("Getting {}'s hotels...".format(city_parser.name))
+            if city_parser.uri:
+                city_parser.start()
+                global current_city_path
+                redis_list_name = '{}:hotel:links'.format(cityname)
+                if redis_db.llen(redis_list_name):
+                    hotel_links = redis_db.lrange(redis_list_name, 0 , -1)
+                else:
+                    hotel_links = city_parser.get_all_hotel_in_city()
+                    redis_db.lpush(redis_list_name, *hotel_links)
+                logger.info('Total hotel in {} is : {}'.format(cityname, len(hotel_links)))
+                current_city_path = os.path.join(CURRENT_PATH, 'data', 'hotel', cityname)
+                os.makedirs(current_city_path, exist_ok=True)
 
 if __name__ == '__main__':
     TripCli()
