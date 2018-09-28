@@ -1,6 +1,5 @@
 # Standard library imports
 import argparse
-import glob
 import os
 import sys
 from multiprocessing.dummy import Pool
@@ -13,7 +12,7 @@ from parsers.city import CityParser
 from parsers.hotel import HotelParser
 from parsers.overall import overall_review_numbers
 from parsers.restaurant import RestaurantParser
-from utils import remove_parenthesis, return_logger, save_csv_file
+from utils import accumulator, remove_parenthesis, return_logger, save_csv_file
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 current_city_path = ''
@@ -100,16 +99,8 @@ The most commonly used trip advisor commands are:
                 pool.map(restaurant_helper, restaurant_links)
                 integrated_reviews = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname) + '.csv'
                 all_csv_files = os.path.join(current_city_path, '*.csv')
-                with open(integrated_reviews, mode='wt') as output_file:
-                    output_file.write('city,restaurant,title,review_text,user_id,date\n')
-                    for csv_file in glob.glob(all_csv_files):
-                        with open(csv_file, mode='rt') as input_file:
-                            next(input_file, None)
-                            for line in input_file:
-                                output_file.write(line)
-                for csv_file in glob.glob(all_csv_files):
-                    os.remove(csv_file)
-                os.rmdir(current_city_path)
+                header = 'city,restaurant,title,review_text,user_id,date\n'
+                accumulator(integrated_reviews, all_csv_files, header)
             else:
                 logger.info('{} city not found'.format(cityname))
                 exit(1)
@@ -164,16 +155,8 @@ The most commonly used trip advisor commands are:
                 pool.map(hotel_helper, hotel_links)
                 integrated_reviews = os.path.join(CURRENT_PATH, 'data', 'hotel', cityname) + '.csv'
                 all_csv_files = os.path.join(current_city_path, '*.csv')
-                with open(integrated_reviews, mode='wt') as output_file:
-                    output_file.write('city,restaurant,user_id,date,rate,title,review_text\n')
-                    for csv_file in glob.glob(all_csv_files):
-                        with open(csv_file, mode='rt') as input_file:
-                            next(input_file, None)
-                            for line in input_file:
-                                output_file.write(line)
-                for csv_file in glob.glob(all_csv_files):
-                    os.remove(csv_file)
-                os.rmdir(current_city_path)
+                header = 'city,restaurant,user_id,date,rate,title,review_text\n'
+                accumulator(integrated_reviews, all_csv_files, header)
             else:
                 logger.info('{} city not found'.format(cityname))
                 exit(1)
