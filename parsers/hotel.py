@@ -1,9 +1,6 @@
 # Third party imports
 import requests
-
 from bs4 import BeautifulSoup
-from lxml import html
-from lxml.etree import tostring
 
 
 class HotelParser:
@@ -76,7 +73,8 @@ class HotelParser:
             data['title'] = review.select_one('.noQuotes').getText()
             data['review_date'] = review.select_one('.ratingDate').attrs['title']
             data['stayed_date'] = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(',')[0]
-            data['trip_type'] = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(' ')[-1]
+            trip_type_text = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(' ')
+            data['trip_type'] = trip_type_text[-1] if len(trip_type_text) > 2 else 'N/A'
             opt_info = self._optional_information(review.select('.recommend-column'))
             data['hotel'] = self.get_name()
             data.update(opt_info)
