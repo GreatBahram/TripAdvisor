@@ -48,7 +48,8 @@ def save_csv_file(csv_file_path, data, type_, city=None):
                 csv_file = open('{}'.format(csv_file_path), mode='wt')
 
             with csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=['city', 'hotel','user_id', 'review_date', 'stayed_date', 'rate', 'title', 'review_text']) 
+                writer = csv.DictWriter(csv_file, fieldnames=['city', 'hotel','user_id', 'review_date', 'stayed_date', \
+                        'trip_type', 'Service', 'Cleanliness', 'SleepQuality', 'rate', 'title', 'review_text']) 
                 if not skip:
                     writer.writeheader()
                 for review in data:

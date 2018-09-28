@@ -50,6 +50,20 @@ class HotelParser:
                 }
         return rating_code.get(class_, 'N/A')
 
+    def _optional_information(self, uls_list):
+        optional_dict = {
+                'Service': 'N/A',
+                'Cleanliness': 'N/A',
+                'SleepQuality': 'N/A',
+                }
+        if uls_list:
+            for ul in uls_list:
+                for li in ul:
+                    li_text = li.getText().replace(' ', '')  
+                    if li_text in optional_dict:
+                        optional_dict[li_text] = self._return_rating_code(li.select_one('div').attrs['class'][-1])
+        return optional_dict
+
     def get_hotel_views_in_this_page(self, page):
         output_list = []
         soup = BeautifulSoup(page.text, 'lxml')
@@ -62,7 +76,10 @@ class HotelParser:
             data['title'] = review.select_one('.noQuotes').getText()
             data['review_date'] = review.select_one('.ratingDate').attrs['title']
             data['stayed_date'] = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(',')[0]
+            data['trip_type'] = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(' ')[-1]
+            opt_info = self._optional_information(review.select('.recommend-column'))
             data['hotel'] = self.get_name()
+            data.update(opt_info)
             output_list.append(data)
         return output_list
 
