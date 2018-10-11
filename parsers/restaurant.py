@@ -1,5 +1,6 @@
 # Standard library imports
 from collections import namedtuple
+from contextlib import suppress
 
 # Third party imports
 import requests
@@ -69,12 +70,12 @@ class RestaurantParser:
         post_data, get_data = self.open_restaurant_page(self.restaurant_link)
         restaurant_link = self.restaurant_link
         list_views = self.get_restaurant_views_in_this_page(post_data)
-        try:
+
+        first_page_number = last_page_number = None
+        with suppress(ValueError, TypeError):
             soup2 = BeautifulSoup(get_data, 'lxml')
             first_page_number = int(soup2.select_one('a.pageNum.first.current').attrs['data-page-number'])
             last_page_number = int(soup2.select_one('a.pageNum.last.taLnk').attrs['data-page-number'])
-        except:
-            first_page_number = last_page_number = None
 
         if first_page_number:
             for page_number in range(first_page_number, last_page_number):
