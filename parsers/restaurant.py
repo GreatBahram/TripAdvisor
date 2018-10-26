@@ -72,7 +72,7 @@ class RestaurantParser:
         list_views = self.get_restaurant_views_in_this_page(post_data)
 
         first_page_number = last_page_number = None
-        with suppress(ValueError, TypeError):
+        with suppress(ValueError, TypeError, AttributeError):
             soup2 = BeautifulSoup(get_data, 'lxml')
             first_page_number = int(soup2.select_one('a.pageNum.first.current').attrs['data-page-number'])
             last_page_number = int(soup2.select_one('a.pageNum.last.taLnk').attrs['data-page-number'])
