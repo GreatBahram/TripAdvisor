@@ -72,7 +72,10 @@ class HotelParser:
             data['user_id'] = review.select_one('.avatar').attrs['class'][-1]
             data['title'] = review.select_one('.noQuotes').getText()
             data['review_date'] = review.select_one('.ratingDate').attrs['title']
-            data['stayed_date'] = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(',')[0]
+            try:
+                data['stayed_date'] = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(',')[0]
+            except:
+                data['stayed_date'] = data['review_date']
             trip_type_text = review.select_one('.recommend-titleInline').getText().partition('Stayed: ')[-1].split(' ')
             data['trip_type'] = trip_type_text[-1] if len(trip_type_text) > 2 else 'N/A'
             opt_info = self._optional_information(review.select('.recommend-column'))
