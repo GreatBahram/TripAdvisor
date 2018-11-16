@@ -117,7 +117,10 @@ The most commonly used trip advisor commands are:
             logger.info("Getting {}'s restaurants...".format(city_parser.name))
 
             if city_parser.uri:
-                data = city_parser._openpage(city_parser.uri)
+                #data = city_parser._openpage(city_parser.uri)
+                city_parser.start()
+                #print(city_parser.vacation_rentals_link)
+                data = city_parser._openpage(city_parser.vacation_rentals_link)
                 if data:
                     global current_city_path
                     current_city_path = os.path.join(CURRENT_PATH, 'data', 'overall') 
