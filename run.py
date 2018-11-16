@@ -55,6 +55,8 @@ def hotel_helper(link):
 
 
 class TripCli():
+    num_of_threads = 5
+
     def __init__(self):
         parser = argparse.ArgumentParser(
             description='Trip Advisor cli',
@@ -95,7 +97,7 @@ The most commonly used trip advisor commands are:
                 logger.info('Total restaurant in {} is : {}'.format(cityname, len(restaurant_links)))
                 current_city_path = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname)
                 os.makedirs(current_city_path, exist_ok=True)
-                pool = Pool(5)
+                pool = Pool(TripCli.num_of_threads)
                 pool.map(restaurant_helper, restaurant_links)
                 integrated_reviews = os.path.join(CURRENT_PATH, 'data', 'restaurant', cityname) + '.csv'
                 all_csv_files = os.path.join(current_city_path, '*.csv')
