@@ -1,11 +1,12 @@
 # Standard library imports
 import json
 import re
+import sys
 import time
 
 # Third party imports
 import requests
-
+from bs4 import BeautifulSoup
 from lxml import html
 from lxml.etree import tostring
 
@@ -21,13 +22,12 @@ class CityParser:
         self.attration_link = ''
         self.resturant_link = ''
         self.hotels = []
-        self.pattern = r'^/Tourism-.*'
+        self.pattern = r'^/Home-.*'
         self.resturants = []
         self.vacation_rentals = []
-        self.uri = self._get_city_uri()
 
     def __repr__(self):
-        return "<CityParser:>"
+        return "<CityParser: {}>".format(self.name)
 
     def start(self):
         self.city_page = self._openpage(self.uri)
@@ -38,28 +38,27 @@ class CityParser:
         b = text.find('"', text.find(variable) + len(variable))
         return text[a: b]
 
-    def _get_city_uri(self):
-        # Create today directory for new crs
+    @property
+    def uri(self):
         try:
             first_page = self.Session.get(self.trip_advisor)
         except Exception as e:
             print(e)
             return None
 
-        # Get City Url
         search_session_id = self._find_variable(first_page.text, 'typeahead.searchSessionId":"')
         time_now = str(int(time.time() * 1000))
-        fetch_city_url = 'https://www.tripadvisor.ca/TypeAheadJson?interleaved=true&geoPages=true&details=true&types' \
-                         '=geo,hotel,eat,attr,vr,air,theme_park,al,act,train,' \
-                         'uni&neighborhood_geos=true&link_type=geo&matchTags=true&matchGlobalTags=true&matchKeywords' \
-                         '=true&matchOverview=true&matchUserProfiles=true&strictAnd=false&scoreThreshold=0.8&hglt' \
-                         '=true&disableMaxGroupSize=true&max=6&injectNewLocation=true&injectLists=true&nearby=true' \
-                         '&local=true&parentids=&typeahead1_5=true&geoBoostFix=true&nearPages=true&nearPagesLevel' \
-                         '=strict&supportedSearchTypes=find_near_stand_alone_query&query=' + self.name + \
-                         '&action=API&uiOrigin=MASTHEAD&source=MASTHEAD&startTime=' + time_now + '&searchSessionId=' \
-                         + search_session_id
-        fetched_cities = self.Session.get(fetch_city_url)
-        data = json.loads(fetched_cities.text)
+        next_url = 'https://www.tripadvisor.ca/TypeAheadJson?interleaved=true&geoPages=true&details=true&types' \
+                '=geo,hotel,eat,attr,vr,air,theme_park,al,act,train,' \
+                'uni&neighborhood_geos=true&link_type=geo&matchTags=true&matchGlobalTags=true&matchKeywords' \
+                '=true&matchOverview=true&matchUserProfiles=true&strictAnd=false&scoreThreshold=0.8&hglt' \
+                '=true&disableMaxGroupSize=true&max=6&injectNewLocation=true&injectLists=true&nearby=true' \
+                '&local=true&parentids=&typeahead1_5=true&geoBoostFix=true&nearPages=true&nearPagesLevel' \
+                '=strict&supportedSearchTypes=find_near_stand_alone_query&query=' + self.name + \
+                '&action=API&uiOrigin=MASTHEAD&source=MASTHEAD&startTime=' + time_now + '&searchSessionId=' \
+                + search_session_id
+        fetched_data = self.Session.get(next_url)
+        data = json.loads(fetched_data.text)
         output = ''
         if 'results' in data:
             if len(data.get("results")) != 0:
@@ -78,21 +77,21 @@ class CityParser:
             city_page = self.Session.get(uri)
         except Exception as e:
             print(e)
-            exit(1)
+            sys.exit(1)
         return city_page.text
 
     def _get_city_links(self):
-        tree = html.fromstring(self.city_page)
-        nev_links = list(set(tree.xpath('//div[@class="navLinks"]/ul/li/a/@href')))
-        for _ in nev_links:
-            if 'Hotels-' in _:
-                self.hotels_link = self.trip_advisor + str(_)
-            elif 'Attractions-' in _:
-                self.attration_link = self.trip_advisor + str(_)
-            elif 'Restaurants-' in _:
-                self.resturant_link = self.trip_advisor + str(_)
-            elif 'VacationRentals-' in _:
-                self.vacation_rentals_link = self.trip_advisor + str(_)
+        soup = BeautifulSoup(self.city_page, 'lxml')
+        for link in soup.findAll('a', {"class": "QuickLinkTileItem__link--f5m0i"}, href=True):
+            text = link.getText()
+            if 'Hotels' in text:
+                self.hotels_link = self.trip_advisor + link['href']
+            elif 'Things to do' in text:
+                self.attration_link = self.trip_advisor + link['href']
+            elif 'Restaurants' in text:
+                self.resturant_link = self.trip_advisor +link['href']
+            elif 'Vacation Rentals' in text:
+                self.vacation_rentals_link = self.trip_advisor +link['href']
 
     def get_all_hotels_in_city(self):
         hotel_page = self._openpage(self.hotels_link)
