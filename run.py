@@ -24,7 +24,7 @@ redis_db = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8",
 def restaurant_helper(link):
     global current_city_path
     restaurant_parser = RestaurantParser(link)
-    restaurant_name = restaurant_parser.get_name()
+    restaurant_name = restaurant_parser.name()
     city_name = current_city_path.split('/')[-1].lower()
     if not redis_db.sismember('{}_restaurnat:'.format(city_name), restaurant_name):
         logger.info("Getting {}'s data...".format(restaurant_name))
@@ -40,7 +40,7 @@ def restaurant_helper(link):
 def hotel_helper(link):
     global current_city_path
     hotel_parser = HotelParser(link)
-    hotel_name = hotel_parser.get_name()
+    hotel_name = hotel_parser.name()
     city_name = current_city_path.split('/')[-1].lower()
     if not redis_db.sismember('{}_hotel:'.format(city_name), hotel_name):
         logger.info("Getting {}'s data...".format(hotel_name))

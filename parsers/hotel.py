@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 class HotelParser:
     def __init__(self, hotel_link):
         self.hotel_link = hotel_link
-        self.name = self.get_name()
         self.session = requests.session()
 
     def __repr__(self):
@@ -26,7 +25,8 @@ class HotelParser:
         except Exception as e:
             return None, None
 
-    def get_name(self):
+    @property
+    def name(self):
         try:
             return self.hotel_link.partition('-Reviews-')[2].split('-')[0]
         except Exception as e:

@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 class RestaurantParser:
     def __init__(self, restaurant_link):
         self.restaurant_link = restaurant_link
-        self.name = self.get_name()
         self.session = requests.session()
 
     def __repr__(self):
@@ -30,7 +29,8 @@ class RestaurantParser:
         except Exception as e:
             return None, None
 
-    def get_name(self):
+    @property
+    def name(self):
         try:
             return self.restaurant_link.partition('-Reviews-')[2].split('-')[0]
         except Exception as e:
