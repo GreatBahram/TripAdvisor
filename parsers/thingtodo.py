@@ -1,6 +1,7 @@
-from lxml.etree import tostring
 import requests
+
 from lxml import html
+from lxml.etree import tostring
 
 
 class ThingToDoParser:
@@ -13,7 +14,6 @@ class ThingToDoParser:
     def set_thing_to_do(self, thing_to_do_link):
         self.trip_advisor = 'https://www.tripadvisor.com'
         self.thing_to_do_link = thing_to_do_link
-        self.name = self.get_thing_to_do_name()
         if self.name is None:
             return None
         self.Session = requests.session()
@@ -42,11 +42,11 @@ class ThingToDoParser:
         except Exception as e:
             return None
 
-    def get_thing_to_do_name(self):
+    @property
+    def name(self):
         try:
-            return self.thing_to_do_link[self.thing_to_do_link.find('-Reviews-') + 9: self.thing_to_do_link.find('-',
-                                                                                               self.thing_to_do_link.find(
-                                                                                                   '-Reviews-') + 9)]
+            return self.thing_to_do_link[self.thing_to_do_link.find('-Reviews-') + 9: 
+                            self.thing_to_do_link.find('-', self.thing_to_do_link.find('-Reviews-') + 9)]
         except Exception as e:
             return None
 

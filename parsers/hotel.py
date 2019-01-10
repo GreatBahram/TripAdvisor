@@ -80,7 +80,7 @@ class HotelParser:
             except TypeError:
                 data['trip_type'] = 'N/A'
             opt_info = self._optional_information(review.select('.recommend-column'))
-            data['hotel'] = self.name()
+            data['hotel'] = self.name
             data.update(opt_info)
             output_list.append(data)
         return output_list
