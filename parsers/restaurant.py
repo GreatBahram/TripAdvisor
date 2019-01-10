@@ -13,7 +13,7 @@ class RestaurantParser:
         self.session = requests.session()
 
     def __repr__(self):
-        return "<RestaurantParser: {}>".format(self.get_name())
+        return "<RestaurantParser: {}>".format(self.name())
 
     def open_restaurant_page(self, restaurant_link):
         try:
@@ -62,7 +62,7 @@ class RestaurantParser:
             data['user_id'] = review.select_one('.avatar').attrs['class'][-1]
             data['title'] = review.select_one('.noQuotes').getText()
             data['date'] = review.select_one('.ratingDate').attrs['title']
-            data['restaurant'] = self.get_name()
+            data['restaurant'] = self.name()
             output_list.append(data)
         return output_list
 
